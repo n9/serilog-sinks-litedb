@@ -76,7 +76,7 @@ namespace Serilog.Sinks.LiteDB.ConsoleTest
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.LiterateConsole(LogEventLevel.Debug)
+                .WriteTo.Console(LogEventLevel.Debug)
                 .WriteTo.LiteDB(connectionString, rollingFilePeriod: RollingPeriod.Quarterly)
                 .Enrich.WithProperty("app", "Serilog.Sinks.LiteDB.ConsoleTest")
                 .Enrich.FromLogContext()
@@ -124,10 +124,14 @@ namespace Serilog.Sinks.LiteDB.ConsoleTest
                 ));
 
                 var a = db.GetCollection("log").Find(Query.All(), 0, 10);
+                var jw = new JsonWriter(Console.Out)
+                {
+                    Pretty = true
+                };
                 foreach(var a1 in a)
                 {
-                    var jsonString = JsonSerializer.Serialize(a1, true);
-                    Console.WriteLine(jsonString);
+                    jw.Serialize(a1);
+                    Console.WriteLine();
                 }
 
                 var documents = coll.FindAll();
